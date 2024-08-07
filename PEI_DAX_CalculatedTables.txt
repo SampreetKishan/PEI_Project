@@ -1,0 +1,24 @@
+MostExpensiveItems = 
+SUMMARIZE(
+    Orders_SW,
+    Orders_SW[country],
+    "MostExpensiveItem", 
+    CALCULATE(
+        FIRSTNONBLANK(Orders_SW[item], 1),
+        FILTER(
+            Orders_SW,
+            Orders_SW[amount] = MAXX(
+                FILTER(Orders_SW, Orders_SW[country] = EARLIER(Orders_SW[country])),
+                Orders_SW[amount]
+            )
+        )
+    ),
+    "MaxAmount", 
+    CALCULATE(
+        MAX(Orders_SW[amount]),
+        FILTER(
+            Orders_SW,
+            Orders_SW[country] = EARLIER(Orders_SW[country])
+        )
+    )
+)

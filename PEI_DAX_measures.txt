@@ -1,0 +1,132 @@
+CountryWithFewestOrders = 
+VAR CountryOrderCounts = 
+    ADDCOLUMNS(
+        SUMMARIZE(
+            Orders_SW,
+            Orders_SW[Country]
+        ),
+        "OrderCount", COUNTROWS(Orders_SW)
+    )
+VAR FewestOrderCountry = 
+    TOPN(
+        1,
+        CountryOrderCounts,
+        [OrderCount],
+        1
+    )
+RETURN
+    MINX(FewestOrderCountry, Orders_SW[Country])
+
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+CountryWithLeastSales = 
+VAR CountrySalesAmounts = 
+    ADDCOLUMNS(
+        SUMMARIZE(
+            Orders_SW,
+            Orders_SW[Country]
+        ),
+        "TotalSalesAmount", SUM(Orders_SW[Amount])
+    )
+VAR LeastSalesCountry = 
+    TOPN(
+        1,
+        CountrySalesAmounts,
+        [TotalSalesAmount],
+        1
+    )
+RETURN
+    MINX(LeastSalesCountry, Orders_SW[Country])
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+LeastOrders = 
+MINX(
+    ADDCOLUMNS(
+        SUMMARIZE(
+            Orders_SW,
+            Orders_SW[Country]
+        ),
+        "OrderCount", CALCULATE(COUNTROWS(Orders_SW))
+    ),
+    [OrderCount]
+)
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+LeastSalesAmount = 
+MINX(
+    ADDCOLUMNS(
+        SUMMARIZE(
+            Orders_SW,
+            Orders_SW[Country]
+        ),
+        "TotalSalesAmount", CALCULATE(SUM(Orders_SW[Amount]))
+    ),
+    [TotalSalesAmount]
+)
+
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+MostCommonItem = 
+VAR ItemSales = 
+    SUMMARIZE(
+        ORDERS_SW, 
+        ORDERS_SW[ITEM],
+        "ItemCount", COUNTROWS(ORDERS_SW)
+    )
+VAR MaxItem = 
+    MAXX(
+        TOPN(1, ItemSales, [ItemCount], DESC),
+        [Item]
+    )
+RETURN
+    MaxItem
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+MostCommonItem_Count = 
+VAR MaxItem = [MostCommonItem]
+RETURN
+    CALCULATE(
+        COUNTROWS(ORDERS_SW),
+        ORDERS_SW[ITEM]= MaxItem
+    )
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+Count_Delivered = CALCULATE(COUNT(SHIPPING_SW[CUSTOMER_ID]),FILTER(SHIPPING_SW,SHIPPING_SW[STATUS]=="Delivered"))
+
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+
+Count_Delivered = CALCULATE(COUNT(SHIPPING_SW[CUSTOMER_ID]),FILTER(SHIPPING_SW,SHIPPING_SW[STATUS]=="Delivered"))
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+Count_Shipping_Delivered = CALCULATE(
+            COUNT(SHIPPING_SW[CUSTOMER_ID]),
+            FILTER(
+                SHIPPING_SW, 
+                SHIPPING_SW[STATUS] == "Delivered")
+            )
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+Count_Shipping_Pending = CALCULATE(
+            COUNT(SHIPPING_SW[Customer_ID]),
+            FILTER(
+                SHIPPING_SW, 
+                SHIPPING_SW[STATUS] == "Pending")
+            )
